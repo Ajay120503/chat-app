@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore.js';
 import { MessageSquare, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import toast from 'react-hot-toast';
 
 const Login = () => {
