@@ -1,7 +1,7 @@
 import Group from "../models/group.model.js";
 import Message from "../models/message.model.js";
 import { io } from "../lib/socket.js";
-
+import cloudinary from "../lib/cloudinary.js";
 
 // CREATE GROUP
 export const createGroup = async (req, res) => {
@@ -60,29 +60,66 @@ export const getGroupMessages = async (req, res) => {
 
 
 // SEND GROUP MESSAGE
+// export const sendGroupMessage = async (req, res) => {
+//   try {
+
+//     const { groupId } = req.params;
+//     const { text } = req.body;
+
+//     const message = new Message({
+//       senderId: req.user._id,
+//       groupId,
+//       text
+//     });
+
+//     await message.save();
+
+//     io.to(groupId).emit("newGroupMessage", message);
+
+//     res.status(201).json(message);
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
 export const sendGroupMessage = async (req, res) => {
   try {
-
     const { groupId } = req.params;
-    const { text } = req.body;
+    const { text, image } = req.body;
+
+    let imageUrl;
+
+    // upload image if exists
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
+    }
 
     const message = new Message({
       senderId: req.user._id,
       groupId,
-      text
+      text,
+      image: imageUrl,
     });
 
     await message.save();
 
-    io.to(groupId).emit("newGroupMessage", message);
+    // populate sender for frontend UI
+    const populatedMessage = await message.populate(
+      "senderId",
+      "fullName profilePic"
+    );
 
-    res.status(201).json(message);
+    // emit message to group room
+    io.to(groupId).emit("newGroupMessage", populatedMessage);
 
+    res.status(201).json(populatedMessage);
   } catch (error) {
+    console.error("Group message error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 export const addMembersToGroup = async (req, res) => {
   try {
