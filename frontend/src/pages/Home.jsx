@@ -2,9 +2,12 @@ import { useChatStore } from "../store/useChatStore.js";
 import Sidebar from "../components/Sidebar.jsx";
 import NoChatSelected from "../components/NoChatSelected.jsx";
 import ChatContainer from "../components/ChatContainer.jsx";
+import { useGroupStore } from "../store/useGroupStore";
+import GroupChatContainer from "../components/GroupChatContainer";
 
 const Home = () => {
   const { selectedUser } = useChatStore();
+  const { selectedGroup } = useGroupStore();
 
   return (
     <div className="h-screen bg-base-200">
@@ -16,8 +19,15 @@ const Home = () => {
             <Sidebar />
 
             {/* Main Chat Area */}
-            <div className="flex-1">
+            {/* <div className="flex-1">
               {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
+            </div> */}
+            <div className="flex-1">
+              {!selectedUser && !selectedGroup && <NoChatSelected />}
+
+              {selectedUser && <ChatContainer />}
+
+              {selectedGroup && <GroupChatContainer />}
             </div>
           </div>
         </div>

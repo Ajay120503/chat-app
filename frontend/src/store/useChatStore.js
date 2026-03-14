@@ -35,15 +35,42 @@ export const useChatStore = create((set, get) => ({
   },
 
   
-  sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get();
-    try {
-      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
-      set({ messages: [...messages, res.data] });
-    } catch (error) {
-      toast.error(error.response.data.message);
+  // sendMessage: async (messageData) => {
+  //   const { selectedUser, messages } = get();
+  //   try {
+  //     const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+  //     set({ messages: [...messages, res.data] });
+  //   } catch (error) {
+  //     toast.error(error.response.data.message);
+  //   }
+  // },
+
+  sendMessage: async ({ text, image }) => {
+  const { selectedUser, messages } = get();
+
+  if (!selectedUser) {
+    console.error("No selected user");
+    return;
+  }
+
+  try {
+    const res = await axiosInstance.post(
+      `/messages/send/${selectedUser._id}`,
+      { text, image }
+    );
+
+    if (!res || !res.data) {
+      throw new Error("Invalid response from server");
     }
-  },
+
+    set({
+      messages: [...messages, res.data],
+    });
+  } catch (error) {
+    console.error("Send message error:", error);
+    toast.error(error.response?.data?.message || "Failed to send message");
+  }
+},
 
   subscribeToMessages: () => {
     const { selectedUser } = get();

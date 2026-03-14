@@ -1,17 +1,21 @@
 import { useRef, useState } from "react";
-import { useChatStore } from "../store/useChatStore.js";
+import { useGroupStore } from "../store/useGroupStore";
+
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 import imageCompression from "browser-image-compression";
 
-const MessageInput = () => {
+const GroupMessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
+
+  const { sendGroupMessage } = useGroupStore();
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
+
     if (!file || !file.type.startsWith("image/")) {
       toast.error("Please select a valid image file");
       return;
@@ -19,19 +23,21 @@ const MessageInput = () => {
 
     try {
       const compressedFile = await imageCompression(file, {
-        maxSizeMB: 0.05, // 50KB = 0.05MB
-        maxWidthOrHeight: 600, // Optional: you can tune this for better compression
+        maxSizeMB: 0.05,
+        maxWidthOrHeight: 600,
         useWebWorker: true,
       });
 
       const reader = new FileReader();
+
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
+
       reader.readAsDataURL(compressedFile);
     } catch (error) {
       toast.error("Image compression failed");
-      console.error("Compression error:", error);
+      console.error(error);
     }
   };
 
@@ -42,20 +48,21 @@ const MessageInput = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+
     if (!text.trim() && !imagePreview) return;
 
     try {
-      await sendMessage({
+      await sendGroupMessage({
         text: text.trim(),
         image: imagePreview,
       });
 
-      // Clear form
       setText("");
       setImagePreview(null);
+
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("Failed to send group message:", error);
     }
   };
 
@@ -69,10 +76,10 @@ const MessageInput = () => {
               alt="Preview"
               className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
             />
+
             <button
               onClick={removeImage}
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
-              flex items-center justify-center"
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300 flex items-center justify-center"
               type="button"
             >
               <X className="size-3" />
@@ -90,6 +97,7 @@ const MessageInput = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
+
           <input
             type="file"
             accept="image/*"
@@ -100,13 +108,15 @@ const MessageInput = () => {
 
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle
-                     ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
+            className={`hidden sm:flex btn btn-circle ${
+              imagePreview ? "text-emerald-500" : "text-zinc-400"
+            }`}
             onClick={() => fileInputRef.current?.click()}
           >
             <Image size={20} />
           </button>
         </div>
+
         <button
           type="submit"
           className="btn btn-sm btn-circle"
@@ -118,4 +128,5 @@ const MessageInput = () => {
     </div>
   );
 };
-export default MessageInput;
+
+export default GroupMessageInput;

@@ -12,6 +12,7 @@ export const useAuthStore = create((set, get) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   onlineUsers: [],
+  groupMessages: [],
   socket: null,
 
   checkAuth: async () => {
@@ -82,24 +83,80 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+//   connectSocket: () => {
+//     const { authUser } = get();
+//     if (!authUser || get().socket?.connected) return;
+
+//     const socket = io(BASE_URL, {
+//       query: {
+//         userId: authUser._id,
+//       },
+//     });
+//     socket.connect();
+
+//     set({ socket: socket });
+
+//     socket.on("getOnlineUsers", (userIds) => {
+//       set({ onlineUsers: userIds });
+//     });
+
+//     socket.on("newGroupMessage", (message) => {
+//   const { groupMessages } = get();
+
+//   if (!groupMessages.find((m) => m._id === message._id)) {
+//     set({
+//       groupMessages: [...groupMessages, message],
+//     });
+//   }
+// });
+//   },
+//   disconnectSocket: () => {
+//     if (get().socket?.connected) get().socket.disconnect();
+  //   },
   connectSocket: () => {
-    const { authUser } = get();
-    if (!authUser || get().socket?.connected) return;
+  const { authUser } = get();
 
-    const socket = io(BASE_URL, {
-      query: {
-        userId: authUser._id,
-      },
+  if (!authUser || get().socket?.connected) return;
+
+  const socket = io(BASE_URL, {
+    query: {
+      userId: authUser._id,
+    },
+  });
+
+  socket.connect();
+
+  set({ socket });
+
+  // Online users
+  socket.on("getOnlineUsers", (userIds) => {
+    set({ onlineUsers: userIds || [] });
+  });
+
+  // Group messages
+  // socket.on("newGroupMessage", (message) => {
+  //   const { groupMessages } = get();
+
+  //   const messages = groupMessages || []; // safety
+
+  //   const exists = messages.find((m) => m._id === message._id);
+
+  //   if (!exists) {
+  //     set({
+  //       groupMessages: [...messages, message],
+  //     });
+  //   }
+    // });
+  socket.off("newGroupMessage").on("newGroupMessage", (message) => {
+  const { groupMessages } = get();
+
+  const messages = groupMessages || [];
+
+  if (!messages.find((m) => m._id === message._id)) {
+    set({
+      groupMessages: [...messages, message],
     });
-    socket.connect();
-
-    set({ socket: socket });
-
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
-    });
-  },
-  disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
-  },
+  }
+});
+},
 }));

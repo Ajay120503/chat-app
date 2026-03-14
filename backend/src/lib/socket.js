@@ -34,4 +34,31 @@ io.on("connection", (socket) => {
   });
 });
 
+io.on("connection", (socket) => {
+
+  console.log("User connected", socket.id);
+
+  const userId = socket.handshake.query.userId;
+
+  if (userId) userSocketMap[userId] = socket.id;
+
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+
+
+  // JOIN GROUP ROOM
+  socket.on("joinGroup", (groupId) => {
+    socket.join(groupId);
+  });
+
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
+
+    delete userSocketMap[userId];
+
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  });
+
+});
+
 export { io, app, server };
