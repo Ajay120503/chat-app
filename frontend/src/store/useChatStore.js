@@ -45,7 +45,7 @@ export const useChatStore = create((set, get) => ({
   //   }
   // },
 
-  sendMessage: async ({ text, image }) => {
+  sendMessage: async ({ text, image, file }) => {
   const { selectedUser, messages } = get();
 
   if (!selectedUser) {
@@ -56,7 +56,7 @@ export const useChatStore = create((set, get) => ({
   try {
     const res = await axiosInstance.post(
       `/messages/send/${selectedUser._id}`,
-      { text, image }
+      { text, image, file }
     );
 
     if (!res || !res.data) {

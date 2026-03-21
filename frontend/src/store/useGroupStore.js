@@ -40,13 +40,13 @@ export const useGroupStore = create((set, get) => ({
     }
   },
 
-  sendGroupMessage: async ({ text, image }) => {
+  sendGroupMessage: async ({ text, image, file }) => {
   const { selectedGroup, groupMessages } = get();
 
   try {
     const res = await axiosInstance.post(
       `/groups/send/${selectedGroup._id}`,
-      { text, image }
+      { text, image, file }
     );
 
     set({

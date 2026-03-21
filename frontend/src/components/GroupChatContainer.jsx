@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useGroupStore } from "../store/useGroupStore";
 import { useAuthStore } from "../store/useAuthStore";
 import AddMembersModal from "./AddMembersModal.jsx";
-import { UserPlus } from "lucide-react";
 
 import GroupMessageInput from "./GroupMessageInput.jsx";
 import MessageSkeleton from "./skeletons/MessageSkeleton.jsx";
@@ -11,7 +10,6 @@ import { formatMessageTime } from "../lib/utils.js";
 const GroupChatContainer = () => {
   const { selectedGroup, groupMessages, getGroupMessages, isMessagesLoading } =
     useGroupStore();
-  const [showAddMembers, setShowAddMembers] = useState(false);
 
   const { authUser } = useAuthStore();
 
@@ -103,7 +101,7 @@ const GroupChatContainer = () => {
               </div>
 
               {/* Bubble */}
-              <div className="chat-bubble flex flex-col">
+              {/* <div className="chat-bubble flex flex-col">
                 {message.image && (
                   <img
                     src={message.image}
@@ -112,6 +110,53 @@ const GroupChatContainer = () => {
                   />
                 )}
 
+                {message.text && <p>{message.text}</p>}
+              </div> */}
+              <div className="chat-bubble flex flex-col">
+                {/* IMAGE */}
+                {message.image && (
+                  <img
+                    src={message.image}
+                    alt="attachment"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                  />
+                )}
+
+                {/* FILE */}
+                {message.file?.url && (
+                  <div className="mb-2">
+                    {/* IF FILE IS IMAGE */}
+                    {["jpg", "jpeg", "png", "webp"].includes(
+                      message.file.type
+                    ) ? (
+                      <img
+                        src={message.file.url}
+                        alt="file"
+                        className="sm:max-w-[200px] rounded-md"
+                      />
+                    ) : (
+                      <a
+                        href={message.file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 bg-base-200 hover:bg-base-300 transition p-3 rounded-xl max-w-[250px]"
+                      >
+                        <div className="text-2xl">📄</div>
+
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-sm font-medium truncate">
+                            {message.file.name || "File"}
+                          </span>
+                          <span className="text-xs opacity-60">
+                            {message.file.type?.toUpperCase()}
+                          </span>
+                        </div>
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* TEXT */}
                 {message.text && <p>{message.text}</p>}
               </div>
             </div>
