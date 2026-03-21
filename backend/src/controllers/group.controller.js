@@ -86,9 +86,10 @@ export const getGroupMessages = async (req, res) => {
 export const sendGroupMessage = async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { text, image } = req.body;
+    const { text, image, file } = req.body;
 
     let imageUrl;
+    let fileData;
 
     // upload image if exists
     if (image) {
@@ -96,11 +97,34 @@ export const sendGroupMessage = async (req, res) => {
       imageUrl = uploadResponse.secure_url;
     }
 
+    if (file && file.startsWith("data:")) {
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(file, {
+          resource_type: "raw",
+          folder: "chat_files",
+        });
+
+        fileData = {
+          url: uploadResponse.secure_url,
+          name: uploadResponse.original_filename || "file",
+          type: uploadResponse.format,
+          size: uploadResponse.bytes,
+        };
+      } catch (err) {
+        console.error("File upload failed:", err);
+      }
+    }
+
+     console.log("file from frontend:", file);
+    console.log("fileData after upload:", fileData);
+    console.log("Schema file type:", Message.schema.paths.file);
+
     const message = new Message({
       senderId: req.user._id,
       groupId,
       text,
       image: imageUrl,
+      file: fileData,
     });
 
     await message.save();
