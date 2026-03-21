@@ -6,6 +6,7 @@ import MessageInput from "./MessageInput.jsx";
 import MessageSkeleton from "./skeletons/MessageSkeleton.jsx";
 import { useAuthStore } from "../store/useAuthStore.js";
 import { formatMessageTime } from "../lib/utils.js";
+import { File } from "lucide-react";
 
 const ChatContainer = () => {
   const {
@@ -117,7 +118,9 @@ const ChatContainer = () => {
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 bg-base-200 hover:bg-base-300 transition p-3 rounded-xl max-w-[250px]"
                     >
-                      <div className="text-2xl">📄</div>
+                      <div className="text-2xl">
+                        <File />
+                      </div>
 
                       <div className="flex flex-col overflow-hidden">
                         <span className="text-sm font-medium truncate">

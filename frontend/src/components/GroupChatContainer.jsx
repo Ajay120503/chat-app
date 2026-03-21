@@ -6,6 +6,7 @@ import AddMembersModal from "./AddMembersModal.jsx";
 import GroupMessageInput from "./GroupMessageInput.jsx";
 import MessageSkeleton from "./skeletons/MessageSkeleton.jsx";
 import { formatMessageTime } from "../lib/utils.js";
+import { File } from "lucide-react";
 
 const GroupChatContainer = () => {
   const { selectedGroup, groupMessages, getGroupMessages, isMessagesLoading } =
@@ -141,7 +142,9 @@ const GroupChatContainer = () => {
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 bg-base-200 hover:bg-base-300 transition p-3 rounded-xl max-w-[250px]"
                       >
-                        <div className="text-2xl">📄</div>
+                        <div className="text-2xl">
+                          <File />
+                        </div>
 
                         <div className="flex flex-col overflow-hidden">
                           <span className="text-sm font-medium truncate">
